@@ -1,10 +1,9 @@
+import tkinter as tk
+from tkinter import messagebox
 import random
-def print_board(board):
-    for row in board:
-        print(" | ".join(row))
-        print("-" * 5)
-        
+
 def check_winner(board):
+    # Check rows, columns, and diagonals
     for row in board:
         if row[0] == row[1] == row[2] != ' ':
             return row[0]
@@ -21,45 +20,49 @@ def ai_move(board):
     empty_cells = [(r, c) for r in range(3) for c in range(3) if board[r][c] == ' ']
     return random.choice(empty_cells)
 
-def main():
-    board = [[' ' for _ in range(3)] for _ in range(3)]
-    user_symbol = 'X'
-    ai_symbol = 'O'
+def click(row, col):
+    if board[row][col] == ' ' and not winner:
+        board[row][col] = 'X'
+        buttons[row][col].config(text='X', state='disabled')
+        update_game()
 
-    print("Welcome to Tic-Tac-Toe!")
-    print_board(board)
+def update_game():
+    global winner
+    winner = check_winner(board)
+    if winner:
+        end_game(f"{winner} wins!")
+        return
+    if all(board[r][c] != ' ' for r in range(3) for c in range(3)):
+        end_game("It's a draw!")
+        return
+    row, col = ai_move(board)
+    board[row][col] = 'O'
+    buttons[row][col].config(text='O', state='disabled')
+    winner = check_winner(board)
+    if winner:
+        end_game(f"{winner} wins!")
+    elif all(board[r][c] != ' ' for r in range(3) for c in range(3)):
+        end_game("It's a draw!")
 
-    while True:
-        row = int(input(f"Enter row (0-2) for {user_symbol}: "))
-        col = int(input(f"Enter column (0-2) for {user_symbol}: "))
-        if board[row][col] == ' ':
-            board[row][col] = user_symbol
-        else:
-            print("Cell already taken. Try again.")
-            continue
+def end_game(message):
+    messagebox.showinfo("Game Over", message)
+    root.destroy()
 
-        print_board(board)
+# Initialize GUI
+root = tk.Tk()
+root.title("Tic-Tac-Toe")
 
-        winner = check_winner(board)
-        if winner:
-            print(f"{winner} wins!")
-            break
+# Initialize board and GUI elements
+board = [[' ' for _ in range(3)] for _ in range(3)]
+buttons = [[None for _ in range(3)] for _ in range(3)]
+winner = None
 
-        
-        row, col = ai_move(board)
-        board[row][col] = ai_symbol
-        print(f"AI plays at ({row}, {col})")
-        print_board(board)
+# Create buttons
+for r in range(3):
+    for c in range(3):
+        buttons[r][c] = tk.Button(root, text='', font=('Arial', 24), height=2, width=5,
+                                  command=lambda row=r, col=c: click(row, col))
+        buttons[r][c].grid(row=r, column=c)
 
-        winner = check_winner(board)
-        if winner:
-            print(f"{winner} wins!")
-            break
-
-        
-        if all(board[r][c] != ' ' for r in range(3) for c in range(3)):
-            print("It's a draw!")
-            break
-
-if __name__ == "__main__":
-    main()
+# Start the game loop
+root.mainloop()
