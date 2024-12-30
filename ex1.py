@@ -3,7 +3,6 @@ from tkinter import messagebox
 import random
 
 def check_winner(board):
-    # Check rows, columns, and diagonals
     for row in board:
         if row[0] == row[1] == row[2] != ' ':
             return row[0]
@@ -48,21 +47,16 @@ def end_game(message):
     messagebox.showinfo("Game Over", message)
     root.destroy()
 
-# Initialize GUI
 root = tk.Tk()
 root.title("Tic-Tac-Toe")
-
-# Initialize board and GUI elements
 board = [[' ' for _ in range(3)] for _ in range(3)]
 buttons = [[None for _ in range(3)] for _ in range(3)]
 winner = None
 
-# Create buttons
 for r in range(3):
     for c in range(3):
         buttons[r][c] = tk.Button(root, text='', font=('Arial', 24), height=2, width=5,
                                   command=lambda row=r, col=c: click(row, col))
         buttons[r][c].grid(row=r, column=c)
 
-# Start the game loop
 root.mainloop()
